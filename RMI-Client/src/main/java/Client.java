@@ -28,7 +28,7 @@ public class Client {
                 System.out.println("Input your password:");
                 String password = reader.readLine();
 
-                printerResponse = service.login(username, password);
+                printerResponse = Security.decrypt(service.login(Security.encrypt(username), Security.encrypt(password)));
 
                 System.out.println(printerResponse);
             }
@@ -64,7 +64,8 @@ public class Client {
 
     }
 
-    private static String printerAction(BufferedReader reader,PrinterInterface service ,int operation, String token) throws IOException {
+    private static String printerAction(BufferedReader reader, PrinterInterface service ,int operation, String token) throws IOException {
+
         String _responseMessage = "";
         switch (operation) {
             case 1:  operation = 1;
@@ -72,48 +73,48 @@ public class Client {
                 String file = reader.readLine();
                 System.out.println("Write in the printer to print from");
                 String printer1 = reader.readLine();
-                _responseMessage = service.print(file, printer1, token);
+                _responseMessage = Security.decrypt(service.print(Security.encrypt(file),Security.encrypt(printer1), Security.encrypt(token)));
                 break;
             case 2:  operation = 2;
                 System.out.println("Write in the printer to select the queue from");
                 String printer2 = reader.readLine();
-                _responseMessage = service.queue(printer2, token);
+                _responseMessage = Security.decrypt(service.queue(Security.encrypt(printer2), Security.encrypt(token)));
                 break;
             case 3:  operation = 3;
                 System.out.println("Write in the file to move up ( Index )");
                 int index = Integer.parseInt(reader.readLine());
                 System.out.println("Write in the printer in which to move the file to the top of the queue");
                 String printer3 = reader.readLine();
-                _responseMessage = service.topQueue(printer3, index,token);
+                _responseMessage = Security.decrypt(service.topQueue(Security.encrypt(printer3), Security.encrypt(String.valueOf(index)),Security.encrypt(token)));
                 break;
             case 4:  operation = 4;
-                _responseMessage = service.start(token);
+                _responseMessage = Security.decrypt(service.start(Security.encrypt(token)));
                 break;
             case 5:  operation = 5;
-                _responseMessage = service.stop(token);
+                _responseMessage = Security.decrypt(service.stop(Security.encrypt(token)));
                 break;
             case 6:  operation = 6;
-                _responseMessage = service.restart(token);
+                _responseMessage = Security.decrypt(service.restart(Security.encrypt(token)));
                 break;
             case 7:  operation = 7;
                 System.out.println("Write in the printer in which to move the file to the top of the queue");
                 String printer4 = reader.readLine();
-                _responseMessage = service.status(printer4,token);
+                _responseMessage = Security.decrypt(service.status(Security.encrypt(printer4),Security.encrypt(token)));
                 break;
             case 8:  operation = 8;
                 System.out.println("Write in the parameter to read from");
                 String parameter1 = reader.readLine();
-                _responseMessage = service.readConfig(parameter1, token);
+                _responseMessage = Security.decrypt(service.readConfig(Security.encrypt(parameter1), Security.encrypt(token)));
                 break;
             case 9:  operation = 9;
                 System.out.println("Write in the parameter to read from");
                 String parameter2 = reader.readLine();
                 System.out.println("Write the value to set it to");
                 String value = reader.readLine();
-                _responseMessage = service.setConfig(parameter2,value,token);
+                _responseMessage = Security.decrypt(service.setConfig(Security.encrypt(parameter2),Security.encrypt(value),Security.encrypt(token)));
                 break;
             case 10: operation = 10;
-                _responseMessage = service.logout(token);
+                _responseMessage = Security.decrypt(service.logout(Security.encrypt(token)));
                 break;
         }
         return _responseMessage;

@@ -10,7 +10,7 @@ public interface PrinterInterface extends Remote {
 
     public String print(String filename, String printer, String token) throws RemoteException;   // prints file filename on the specified printer
     public String queue(String printer,String token) throws RemoteException;   // lists the print queue for a given printer on the user's display in lines of the form <job number>   <file name>
-    public String topQueue(String printer, int job, String token) throws RemoteException;   // moves job to the top of the queue
+    public String topQueue(String printer, String job, String token) throws RemoteException;   // moves job to the top of the queue
     public String start(String token) throws RemoteException;   // starts the print server
     public String stop(String token) throws RemoteException;   // stops the print server
     public String restart(String token) throws RemoteException;   // stops the print server, clears the print queue and starts the print server again

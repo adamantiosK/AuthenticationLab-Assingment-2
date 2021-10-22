@@ -1,6 +1,5 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -9,7 +8,6 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     HashMap<String, Printer> printers;
     HashMap<String,String> tokens = new HashMap<String,String>();
-
 
     public PrinterServant() throws RemoteException{
         super();
@@ -22,32 +20,32 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String print(String filename, String printer,String token) throws RemoteException {
-        return tokens.containsKey(token)?printers.get(printer).print(filename):"Not Authenticated";
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).print(Security.decrypt(filename))):Security.encrypt("Not Authenticated");
     }
 
     @Override
     public String queue(String printer, String token) throws RemoteException {
-        return tokens.containsKey(token)?printers.get(printer).queue():"Not Authenticated";
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).queue()):Security.encrypt("Not Authenticated");
     }
 
     @Override
-    public String topQueue(String printer, int job, String token) throws RemoteException {
-        return tokens.containsKey(token)?printers.get(printer).topQueue(job):"Not Authenticated";
+    public String topQueue(String printer, String job, String token) throws RemoteException {
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).topQueue(Integer.parseInt(Security.decrypt(job)))):Security.encrypt("Not Authenticated");
     }
 
     @Override
     public String start(String token) throws RemoteException {
-        return tokens.containsKey(token)?"Starting server...":"Not Authenticated";
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt("Starting server..."):Security.encrypt("Not Authenticated");
     }
 
     @Override
     public String stop(String token) throws RemoteException {
-        return tokens.containsKey(token)?"Shutting down server...":"Not Authenticated";
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt("Shutting down server..."):Security.encrypt("Not Authenticated");
     }
 
     @Override
     public String restart(String token) throws RemoteException {
-        if(tokens.containsKey(token)) {
+        if(tokens.containsKey(Security.decrypt(token))) {
             StringBuilder b = new StringBuilder();
             b.append("Shutting down server...\n");
             b.append("Clearing print queue...\n");
@@ -58,19 +56,19 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
             b.append("Starting server...\n");
             return String.valueOf(b);
         }else{
-            return "Not Authenticated";
+            return Security.encrypt("Not Authenticated");
         }
     }
 
     @Override
     public String status(String printer, String token) throws RemoteException {
-        if(tokens.containsKey(token)) {
-            if (printers.containsKey(printer)) {
-                return "Printer is online + \n" + printers.get(printer).status();
+        if(tokens.containsKey(Security.decrypt(token))) {
+            if (printers.containsKey(Security.decrypt(printer))) {
+                return Security.encrypt("Printer is online + \n" + printers.get(Security.decrypt(printer)).status());
             }
-            return "Printer is offline";
+            return Security.encrypt("Printer is offline");
         }else{
-            return "Not Authenticated";
+            return Security.encrypt("Not Authenticated");
         }
     }
 
@@ -86,13 +84,13 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String login(String username, String password) throws RemoteException {
-        return UserExists(username,password)?generateARandomToken(username):"username or Password incorrect";
+        return UserExists(Security.decrypt(username),Security.decrypt(password))?Security.encrypt(generateARandomToken(Security.decrypt(username))):Security.encrypt("username or Password incorrect");
     }
 
     @Override
     public String logout(String token) throws RemoteException {
-        tokens.remove(token);
-        return "Logged Out";
+        tokens.remove(Security.decrypt(token));
+        return Security.encrypt("Logged Out");
     }
 
     private Boolean UserExists(String Username, String Password){
