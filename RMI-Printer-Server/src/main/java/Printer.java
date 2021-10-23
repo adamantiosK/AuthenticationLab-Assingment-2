@@ -2,8 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Printer {
-    String name;
-    ArrayList<String> printQueue;
+    private String name;
+    private ArrayList<String> printQueue;
 
     public Printer(String name, List filenames) {
         this.name = name;

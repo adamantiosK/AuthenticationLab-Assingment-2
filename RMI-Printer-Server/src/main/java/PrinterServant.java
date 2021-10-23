@@ -6,14 +6,14 @@ import java.util.Random;
 
 public class PrinterServant extends UnicastRemoteObject implements PrinterInterface {
 
-    HashMap<String, Printer> printers;
-    HashMap<String,String> tokens = new HashMap<String,String>();
+    private HashMap<String, Printer> printers;
+    private HashMap<String,String> tokens = new HashMap<String,String>();
 
     public PrinterServant() throws RemoteException{
         super();
         printers = new HashMap<>();
-        Printer printer1 = new Printer("printer1", List.of("file1", "file2"));
-        Printer printer2 = new Printer("printer2", List.of("file3", "file4"));
+        Printer printer1 = new Printer("printer1", List.of("file1", "file2","file3", "file4"));
+        Printer printer2 = new Printer("printer2", List.of("file5", "file6"));
         printers.put("printer1", printer1);
         printers.put("printer2", printer2);
     }
@@ -54,7 +54,7 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
             }
             b.append("Print queue cleared\n");
             b.append("Starting server...\n");
-            return String.valueOf(b);
+            return Security.encrypt(String.valueOf(b));
         }else{
             return Security.encrypt("Not Authenticated");
         }
@@ -112,6 +112,6 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
         tokens.put(generatedString,Username);
         return generatedString;
-    } // Number 5 from https://www.baeldung.com/java-random-string
+    } // Article number 5 from https://www.baeldung.com/java-random-string
 
 }
