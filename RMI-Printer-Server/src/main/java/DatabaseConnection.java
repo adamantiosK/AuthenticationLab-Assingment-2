@@ -35,10 +35,7 @@ public class DatabaseConnection {
             }
 
 
-            return Integer.parseInt(count)>0;
-
-
-//            return true;
+            return (Integer.parseInt(count)!=0);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

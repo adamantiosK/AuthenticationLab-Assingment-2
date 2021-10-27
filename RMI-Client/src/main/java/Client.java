@@ -59,8 +59,11 @@ public class Client {
         System.out.println("(8) - Read Configuration");
         System.out.println("(9) - Set Configuration");
         System.out.println("(10) - Log Out");
-
-        return Integer.parseInt(reader.readLine());
+        try{
+            return Integer.parseInt(reader.readLine());
+        }catch (Exception e){
+            return 0;
+        }
 
     }
 
@@ -68,6 +71,9 @@ public class Client {
 
         String _responseMessage = "";
         switch (operation) {
+            case 0:  operation = 0;
+                _responseMessage = "No action Selected";
+                break;
             case 1:  operation = 1;
                 System.out.println("Write in the file to print");
                 String file = reader.readLine();

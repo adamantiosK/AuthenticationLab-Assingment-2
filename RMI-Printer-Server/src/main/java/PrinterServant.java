@@ -23,17 +23,30 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String print(String filename, String printer,String token) throws RemoteException {
-        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).print(Security.decrypt(filename))):Security.encrypt("Not Authenticated");
+        try {
+            return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt(printers.get(Security.decrypt(printer)).print(Security.decrypt(filename))) : Security.encrypt("Not Authenticated");
+        }catch(Exception e){
+            return Security.encrypt("System error: filename, printer doesn't match an existing one or another error occurred");
+        }
     }
+
 
     @Override
     public String queue(String printer, String token) throws RemoteException {
-        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).queue()):Security.encrypt("Not Authenticated");
+        try{
+            return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).queue()):Security.encrypt("Not Authenticated");
+         }catch(Exception e){
+            return Security.encrypt("System error:  printer doesn't match an existing one or another error occurred");
+        }
     }
 
     @Override
     public String topQueue(String printer, String job, String token) throws RemoteException {
-        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).topQueue(Integer.parseInt(Security.decrypt(job)))):Security.encrypt("Not Authenticated");
+        try {
+            return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt(printers.get(Security.decrypt(printer)).topQueue(Integer.parseInt(Security.decrypt(job)))) : Security.encrypt("Not Authenticated");
+        } catch (Exception e) {
+            return Security.encrypt("System error:  printer, job doesn't match an existing one or another error occurred");
+        }
     }
 
     @Override
@@ -66,10 +79,14 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     @Override
     public String status(String printer, String token) throws RemoteException {
         if(tokens.containsKey(Security.decrypt(token))) {
-            if (printers.containsKey(Security.decrypt(printer))) {
-                return Security.encrypt("Printer is online + \n" + printers.get(Security.decrypt(printer)).status());
+            try {
+                if (printers.containsKey(Security.decrypt(printer))) {
+                    return Security.encrypt("Printer is online + \n" + printers.get(Security.decrypt(printer)).status());
+                }
+                return Security.encrypt("Printer is offline");
+            }catch(Exception e){
+                return Security.encrypt("System error:  printer doesn't match an existing one or another error occurred");
             }
-            return Security.encrypt("Printer is offline");
         }else{
             return Security.encrypt("Not Authenticated");
         }
@@ -78,7 +95,11 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     @Override
     public String readConfig(String parameter, String token) throws RemoteException {
         if(tokens.containsKey(Security.decrypt(token))) {
-            return Security.encrypt(configuration.get(Security.decrypt(parameter)));
+            try {
+                return Security.encrypt(configuration.get(Security.decrypt(parameter)));
+            }catch(Exception e){
+                return Security.encrypt("System error:  Parameter doesn't match an existing one or another error occurred");
+            }
         }else{
             return Security.encrypt("Not Authenticated");
         }
@@ -87,8 +108,16 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     @Override
     public String setConfig(String parameter, String value, String token) throws RemoteException {
         if(tokens.containsKey(Security.decrypt(token))) {
-            configuration.put(Security.decrypt(parameter),Security.decrypt(value));
-            return Security.encrypt("Configuration successfully updated");
+            try {
+                if(configuration.containsKey(Security.decrypt(parameter))){
+                    configuration.put(Security.decrypt(parameter), Security.decrypt(value));
+                    return Security.encrypt("Configuration successfully updated");
+                }else{
+                    return Security.encrypt("Parameter doesnt exist");
+                }
+            }catch(Exception e){
+                return Security.encrypt("System error:  Parameter doesn't match an existing one or another error occurred");
+            }
         }else{
             return Security.encrypt("Not Authenticated");
         }
