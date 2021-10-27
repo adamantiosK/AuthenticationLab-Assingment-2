@@ -1,23 +1,101 @@
+import java.nio.charset.StandardCharsets;
+import java.security.spec.KeySpec;
+import java.util.Base64;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
-public class Security {
+class Security { // Source : https://www.geeksforgeeks.org/what-is-java-aes-encryption-and-decryption/
 
-    private static int key = 14;
+    // Class private variables
+    private static final String SECRET_KEY
+            = "DoNotTellAnyone123";
 
-    static String encrypt(String input)  {
-        char[] chars = input.toCharArray();
-        char[] charsNew = new char[chars.length];
-        for(int i=0; i<chars.length;i++){
-            charsNew[i] = (char) (chars[i]+key);
+    private static final String SALT = "AuthenticationLab-TopSecret";
+
+    // This method use to encrypt to string
+    public static String encrypt(String strToEncrypt)
+    {
+        try {
+
+            // Create default byte array
+            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0 };
+            IvParameterSpec ivspec
+                    = new IvParameterSpec(iv);
+
+            // Create SecretKeyFactory object
+            SecretKeyFactory factory
+                    = SecretKeyFactory.getInstance(
+                    "PBKDF2WithHmacSHA256");
+
+            // Create KeySpec object and assign with
+            // constructor
+            KeySpec spec = new PBEKeySpec(
+                    SECRET_KEY.toCharArray(), SALT.getBytes(),
+                    65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKeySpec secretKey = new SecretKeySpec(
+                    tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance(
+                    "AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey,
+                    ivspec);
+            // Return encrypted string
+            return Base64.getEncoder().encodeToString(
+                    cipher.doFinal(strToEncrypt.getBytes(
+                            StandardCharsets.UTF_8)));
         }
-        return String.valueOf(charsNew);
+        catch (Exception e) {
+            System.out.println("Error while encrypting: "
+                    + e.toString());
+        }
+        return null;
     }
 
-    static String decrypt(String encryptedMessage){
-        char[] chars = encryptedMessage.toCharArray();
-        char[] charsNew = new char[chars.length];
-        for(int i=0; i<chars.length;i++){
-            charsNew[i] = (char) (chars[i]-key);
+    // This method use to decrypt to string
+    public static String decrypt(String strToDecrypt)
+    {
+        try {
+
+            // Default byte array
+            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0 };
+            // Create IvParameterSpec object and assign with
+            // constructor
+            IvParameterSpec ivspec
+                    = new IvParameterSpec(iv);
+
+            // Create SecretKeyFactory Object
+            SecretKeyFactory factory
+                    = SecretKeyFactory.getInstance(
+                    "PBKDF2WithHmacSHA256");
+
+            // Create KeySpec object and assign with
+            // constructor
+            KeySpec spec = new PBEKeySpec(
+                    SECRET_KEY.toCharArray(), SALT.getBytes(),
+                    65536, 256);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKeySpec secretKey = new SecretKeySpec(
+                    tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance(
+                    "AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey,
+                    ivspec);
+            // Return decrypted string
+            return new String(cipher.doFinal(
+                    Base64.getDecoder().decode(strToDecrypt)));
         }
-        return String.valueOf(charsNew);
+        catch (Exception e) {
+            System.out.println("Error while decrypting: "
+                    + e.toString());
+        }
+        return null;
     }
 }

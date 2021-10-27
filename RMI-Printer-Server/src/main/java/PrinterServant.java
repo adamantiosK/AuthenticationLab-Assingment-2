@@ -88,7 +88,7 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     public String setConfig(String parameter, String value, String token) throws RemoteException {
         if(tokens.containsKey(Security.decrypt(token))) {
             configuration.put(Security.decrypt(parameter),Security.decrypt(value));
-            return Security.decrypt("Configuration successfully updated");
+            return Security.encrypt("Configuration successfully updated");
         }else{
             return Security.encrypt("Not Authenticated");
         }
