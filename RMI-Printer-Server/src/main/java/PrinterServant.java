@@ -8,6 +8,7 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     private HashMap<String, Printer> printers;
     private HashMap<String,String> tokens = new HashMap<String,String>();
+    private HashMap<String,String> configuration = new HashMap<String,String>();
 
     public PrinterServant() throws RemoteException{
         super();
@@ -16,6 +17,8 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
         Printer printer2 = new Printer("printer2", List.of("file5", "file6"));
         printers.put("printer1", printer1);
         printers.put("printer2", printer2);
+        configuration.put("colour", "Black-White");
+        configuration.put("size", "A4");
     }
 
     @Override
@@ -74,12 +77,21 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String readConfig(String parameter, String token) throws RemoteException {
-        return null;
+        if(tokens.containsKey(Security.decrypt(token))) {
+            return Security.encrypt(configuration.get(Security.decrypt(parameter)));
+        }else{
+            return Security.encrypt("Not Authenticated");
+        }
     }
 
     @Override
     public String setConfig(String parameter, String value, String token) throws RemoteException {
-        return "";
+        if(tokens.containsKey(Security.decrypt(token))) {
+            configuration.put(Security.decrypt(parameter),Security.decrypt(value));
+            return Security.decrypt("Configuration successfully updated");
+        }else{
+            return Security.encrypt("Not Authenticated");
+        }
     }
 
     @Override
