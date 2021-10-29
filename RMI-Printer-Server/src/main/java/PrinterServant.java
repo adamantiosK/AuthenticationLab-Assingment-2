@@ -7,6 +7,7 @@ import java.util.Random;
 public class PrinterServant extends UnicastRemoteObject implements PrinterInterface {
 
     private HashMap<String, Printer> printers;
+    private Boolean serverStatus;
     private HashMap<String,String> tokens = new HashMap<String,String>();
     private HashMap<String,String> configuration = new HashMap<String,String>();
 
@@ -19,11 +20,14 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
         printers.put("printer2", printer2);
         configuration.put("colour", "Black-White");
         configuration.put("size", "A4");
+        serverStatus = true;
     }
 
     @Override
     public String print(String filename, String printer,String token) throws RemoteException {
         try {
+            if(serverStatus.equals(false))
+                return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
             return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt(printers.get(Security.decrypt(printer)).print(Security.decrypt(filename))) : Security.encrypt("Not Authenticated");
         }catch(Exception e){
             return Security.encrypt("System error: filename, printer doesn't match an existing one or another error occurred");
@@ -34,8 +38,11 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     @Override
     public String queue(String printer, String token) throws RemoteException {
         try{
+            if(serverStatus.equals(false))
+                return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
+
             return tokens.containsKey(Security.decrypt(token))?Security.encrypt(printers.get(Security.decrypt(printer)).queue()):Security.encrypt("Not Authenticated");
-         }catch(Exception e){
+        }catch(Exception e){
             return Security.encrypt("System error:  printer doesn't match an existing one or another error occurred");
         }
     }
@@ -43,6 +50,8 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     @Override
     public String topQueue(String printer, String job, String token) throws RemoteException {
         try {
+            if(serverStatus.equals(false))
+                return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
             return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt(printers.get(Security.decrypt(printer)).topQueue(Integer.parseInt(Security.decrypt(job)))) : Security.encrypt("Not Authenticated");
         } catch (Exception e) {
             return Security.encrypt("System error:  printer, job doesn't match an existing one or another error occurred");
@@ -51,16 +60,18 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String start(String token) throws RemoteException {
-        return tokens.containsKey(Security.decrypt(token))?Security.encrypt("Starting server..."):Security.encrypt("Not Authenticated");
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(startServer()):Security.encrypt("Not Authenticated");
     }
 
     @Override
     public String stop(String token) throws RemoteException {
-        return tokens.containsKey(Security.decrypt(token))?Security.encrypt("Shutting down server..."):Security.encrypt("Not Authenticated");
+        return tokens.containsKey(Security.decrypt(token))?Security.encrypt(stopServer()):Security.encrypt("Not Authenticated");
     }
 
     @Override
     public String restart(String token) throws RemoteException {
+        if(serverStatus.equals(false))
+            return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
         if(tokens.containsKey(Security.decrypt(token))) {
             StringBuilder b = new StringBuilder();
             b.append("Shutting down server...\n");
@@ -78,6 +89,8 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String status(String printer, String token) throws RemoteException {
+        if(serverStatus.equals(false))
+            return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
         if(tokens.containsKey(Security.decrypt(token))) {
             try {
                 if (printers.containsKey(Security.decrypt(printer))) {
@@ -94,6 +107,8 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String readConfig(String parameter, String token) throws RemoteException {
+        if(serverStatus.equals(false))
+            return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
         if(tokens.containsKey(Security.decrypt(token))) {
             try {
                 return Security.encrypt(configuration.get(Security.decrypt(parameter)));
@@ -107,6 +122,8 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     @Override
     public String setConfig(String parameter, String value, String token) throws RemoteException {
+        if(serverStatus.equals(false))
+            return tokens.containsKey(Security.decrypt(token)) ? Security.encrypt("Server is not running"): Security.encrypt("Not Authenticated");
         if(tokens.containsKey(Security.decrypt(token))) {
             try {
                 if(configuration.containsKey(Security.decrypt(parameter))){
@@ -137,6 +154,23 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     private Boolean UserExists(String Username, String Password){
         DatabaseConnection db = new DatabaseConnection();
         return db.userAuthenticated(Username,Password);
+    }
+    private String startServer() {
+        if(serverStatus.equals(false)){
+            serverStatus = true;
+            return "Starting server...";
+        }else {
+            return "Server is already running!";
+        }
+    }
+
+    private String stopServer() {
+        if(serverStatus.equals(true)){
+            serverStatus = false;
+            return "Shutting down server...";
+        }else {
+            return "Server is already shut Down!";
+        }
     }
 
     private String generateARandomToken(String Username) {

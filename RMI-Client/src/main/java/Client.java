@@ -103,7 +103,7 @@ public class Client {
                 _responseMessage = Security.decrypt(service.restart(Security.encrypt(token)));
                 break;
             case 7:  operation = 7;
-                System.out.println("Write in the printer in which to move the file to the top of the queue");
+                System.out.println("Write in the printer to get status");
                 String printer4 = reader.readLine();
                 _responseMessage = Security.decrypt(service.status(Security.encrypt(printer4),Security.encrypt(token)));
                 break;
