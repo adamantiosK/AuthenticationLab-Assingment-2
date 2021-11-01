@@ -5,16 +5,16 @@ public class DatabaseConnection {
 
     //Source : https://docs.microsoft.com/en-us/sql/connect/jdbc/step-3-proof-of-concept-connecting-to-sql-using-java?view=sql-server-ver15
 
-    public Boolean userAuthenticated(String Username, String Password) {
+    private static String connectionUrl =
+            "jdbc:sqlserver://dtucourses.database.windows.net:1433;"
+                    + "database=AuthLab;"
+                    + "user=DataSecurity;"
+                    + "password=DS12346!;"
+                    + "encrypt=true;"
+                    + "trustServerCertificate=false;"
+                    + "loginTimeout=30;";
 
-        String connectionUrl =
-                "jdbc:sqlserver://dtucourses.database.windows.net:1433;"
-                        + "database=AuthLab;"
-                        + "user=DataSecurity;"
-                        + "password=DS12346!;"
-                        + "encrypt=true;"
-                        + "trustServerCertificate=false;"
-                        + "loginTimeout=30;";
+    public static Boolean userAuthenticated(String Username, String Password) {
         
         ResultSet resultSet = null;
 
@@ -39,6 +39,27 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public static String getAccessControl(String Username) { ResultSet resultSet = null;
+
+        try (Connection connection = DriverManager.getConnection(connectionUrl);
+             Statement statement = connection.createStatement();) {
+
+            String selectSql = ("SELECT AccessRight FROM dbo.Users WHERE dbo.Users.Username= '"+Username+"';");
+
+
+            resultSet = statement.executeQuery(selectSql);
+            String accessRight = "";
+            while (resultSet.next()) {
+                accessRight = resultSet.getString(1);
+            }
+
+            return accessRight;
+        } catch (SQLException e) {
+            System.out.println(e.toString());
+            return "User" ;
         }
     }
 }
