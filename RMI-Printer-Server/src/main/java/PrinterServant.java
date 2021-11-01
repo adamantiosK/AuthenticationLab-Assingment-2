@@ -163,7 +163,7 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
             return "Server is already running!";
         }
     }
-
+    
     private String stopServer() {
         if(serverStatus.equals(true)){
             serverStatus = false;
