@@ -191,7 +191,7 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
 
-        tokens.put(generatedString,DatabaseConnection.getAccessControl(Username));
+        tokens.put(generatedString,Username);
         return generatedString;
     } // Article number 5 from https://www.baeldung.com/java-random-string
 

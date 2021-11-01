@@ -41,26 +41,5 @@ public class DatabaseConnection {
             return false;
         }
     }
-
-    public static String getAccessControl(String Username) { ResultSet resultSet = null;
-
-        try (Connection connection = DriverManager.getConnection(connectionUrl);
-             Statement statement = connection.createStatement();) {
-
-            String selectSql = ("SELECT AccessRight FROM dbo.Users WHERE dbo.Users.Username= '"+Username+"';");
-
-
-            resultSet = statement.executeQuery(selectSql);
-            String accessRight = "";
-            while (resultSet.next()) {
-                accessRight = resultSet.getString(1);
-            }
-
-            return accessRight;
-        } catch (SQLException e) {
-            System.out.println(e.toString());
-            return "User" ;
-        }
-    }
 }
 
