@@ -40,11 +40,10 @@ public class PolicyReader {
             for (int j = 1; j < table[0].length; j++) {
                 HashMap<String,Boolean> entry = new HashMap<String,Boolean>();
                 for (int i = 1; i < table.length; i++) {
-                    entry.put(table[i][0],table[i][1].equals(1));
+                    entry.put(table[i][0],table[i][j].equals("1"));
                 }
                 policy.put(table[0][j],entry);
             }
-            System.out.println(policy);
             return policy;
         }
 }
