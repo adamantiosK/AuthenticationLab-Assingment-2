@@ -1,6 +1,6 @@
 x Manager ServiceTech PowerUser User
-Print 1 1 1 1
-Queue 1 1 1 1
+Print 1 0 1 1
+Queue 1 0 1 1
 TopQueue 1 0 1 0
 Start 1 1 0 0
 Stop 1 1 0 0
