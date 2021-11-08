@@ -1,6 +1,6 @@
 x adam christos joachim nikos Alice Bob Cecilia David Erica Fred George username
-Print 1 1 1 1 1 1 1 1 1 1 1 1
-Queue 1 1 1 1 1 1 1 1 1 1 1 1
+Print 1 1 1 1 1 0 1 1 1 1 1 1
+Queue 1 1 1 1 1 0 1 1 1 1 1 1
 TopQueue 1 1 1 1 1 0 1 0 0 0 0 0
 Start 1 1 1 1 1 1 0 0 0 0 0 0
 Stop 1 1 1 1 1 1 0 0 0 0 0 0
