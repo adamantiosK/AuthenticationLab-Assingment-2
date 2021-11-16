@@ -1,5 +1,7 @@
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseConnection {
 
@@ -42,24 +44,27 @@ public class DatabaseConnection {
         }
     }
 
-    public static String getAccessControl(String Username) { ResultSet resultSet = null;
+    public static List<String> getAccessControl(String Username) { ResultSet resultSet = null;
 
         try (Connection connection = DriverManager.getConnection(connectionUrl);
              Statement statement = connection.createStatement();) {
 
-            String selectSql = ("SELECT AccessRight FROM dbo.Users WHERE dbo.Users.Username= '"+Username+"';");
+            String selectSql = ("SELECT AccessRight FROM dbo.AccessControl WHERE dbo.AccessControl.Username='"+Username+"';");
 
 
             resultSet = statement.executeQuery(selectSql);
-            String accessRight = "";
+            List<String> accessRight = new ArrayList<String>() {};
             while (resultSet.next()) {
-                accessRight = resultSet.getString(1);
+                accessRight.add(resultSet.getString(1));
+                System.out.println(accessRight);
             }
 
             return accessRight;
         } catch (SQLException e) {
             System.out.println(e.toString());
-            return "User" ;
+            List<String> accessRight = new ArrayList<String>() {};
+            accessRight.add("User");
+            return accessRight;
         }
     }
 }

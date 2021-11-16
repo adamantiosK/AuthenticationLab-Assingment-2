@@ -1,5 +1,6 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -8,8 +9,8 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
 
     private HashMap<String, Printer> printers;
     private Boolean serverStatus;
-    private HashMap<String,String> tokens = new HashMap<String,String>();
-    private HashMap<String,String> configuration = new HashMap<String,String>();
+    private HashMap<String, ArrayList> tokens = new HashMap<String,ArrayList>();
+    private HashMap<String, String> configuration = new HashMap<String,String>();
     private HashMap<String, HashMap<String,Boolean>> policy;
 
     public PrinterServant() throws Exception {
@@ -175,8 +176,17 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
     }
 
     private Boolean hasAuthority(String token,String function){
-        System.out.println("Authority status: " + policy.get(tokens.get(token)).get(function));
-        return policy.get(tokens.get(token)).get(function);
+       // System.out.println("Authority status: " + policy.get(tokens.get(token)).get(function));
+        return anyRole(tokens.get(token),function);
+    }
+
+    private Boolean anyRole(ArrayList<String> roles, String function) {
+        for (int i = 0; i < roles.size(); i++) {
+            if (policy.get(roles.get(i)).get(function)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String generateARandomToken(String Username) {
@@ -191,7 +201,7 @@ public class PrinterServant extends UnicastRemoteObject implements PrinterInterf
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
 
-        tokens.put(generatedString,DatabaseConnection.getAccessControl(Username));
+        tokens.put(generatedString, (ArrayList) DatabaseConnection.getAccessControl(Username));
         return generatedString;
     } // Article number 5 from https://www.baeldung.com/java-random-string
 

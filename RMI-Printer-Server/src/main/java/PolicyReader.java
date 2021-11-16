@@ -22,7 +22,7 @@ public class PolicyReader {
         private static String[][] readFile() throws FileNotFoundException {
             Scanner sc = new Scanner(new BufferedReader(new FileReader(".\\RMI-Printer-Server\\src\\main\\AccessControlPolicy.txt")));
             int rows = 10;
-            int columns = 5;
+            int columns = 6;
             String [][] myArray = new String[rows][columns];
             while(sc.hasNextLine()) {
                 for (int i=0; i<myArray.length; i++) {
